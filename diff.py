@@ -61,10 +61,14 @@ if __name__ == '__main__':
 
     # now we need to get the diff of the captured agents:
         # with slight change in the above loop
-    if(agents_queue.count()>0):
+    if(agents_queue.count>0):
         print("Printing the agents not in the agentExport directory")
+        filter = "--filter "
         for agent in agents_queue:
             if agent not in agent_dirs:
                 print (agent)
+                filter += " %s"%agent
+        print filter
+
 
 
