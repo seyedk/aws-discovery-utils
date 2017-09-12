@@ -108,3 +108,25 @@ WITH SERDEPROPERTIES (
   'serialization.format' = '1'
 ) LOCATION 's3://<BUCKET>/sourceProcessConnection/'
 TBLPROPERTIES ('has_encrypted_data'='false');
+
+CREATE EXTERNAL TABLE IF NOT EXISTS Server (
+  `Id` string,
+  `accountNumber` bigint,
+  `agentId` string,
+  `cpuType` string,
+  `hostName` string,
+  `hypervisor` string,
+  `osName` string,
+  `osVersion` string,
+  `smBiosId` string,
+  `type` string,
+  `creationTimeStamp` timestamp,
+  `lastModifiedTimeStamp` timestamp,
+  `agentProvidedTimeStamp` timestamp
+)
+ROW FORMAT SERDE 'org.apache.hadoop.hive.serde2.lazy.LazySimpleSerDe'
+WITH SERDEPROPERTIES (
+  'serialization.format' = ',',
+  'field.delim' = ','
+) LOCATION 's3://pds-ads-export/Server/'
+TBLPROPERTIES ('has_encrypted_data'='false')
