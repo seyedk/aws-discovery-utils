@@ -1,11 +1,12 @@
-import os
-import sys
-import argparse
-import shutil
+
 from pyspark import SparkContext
 from pyspark import SparkConf
 from pyspark.sql import SQLContext
 from pyspark.sql.types import *
+import os
+import sys
+import argparse
+import shutil
 import time
 import csv
 import datetime
