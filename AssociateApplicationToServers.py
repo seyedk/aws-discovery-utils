@@ -4,10 +4,9 @@ import shutil
 import boto3
 import logging
 
-Hosts = {'app1':"dc1qsiapi01t01", 'app2':'dc1zxabojv01t01', 'app3':'dc1yhbfiyd01t01'}
 
 server_filename = "servers.csv"
-app_server_file_name="app_server.csv"
+app_server_file_name="Seyed.csv"
 serverMap = {}
 app_server_list=[]
 
@@ -17,11 +16,18 @@ def load_serverMap():
         reader = csv.reader(f)
         header_row = next(reader)
         for row in reader:
-            key = str(row[4]).lower().strip()
-            serverMap[key]= str(row[0]).lower().strip()
-            #serverMap['HostName']=row[1]
+            # row 4 is the host name
+            hostName = str(row[4]).lower().strip()
+            if "pdsi.corp" in hostName:
+                logging.info("host name %s is fully quilifed already. Will remove the fqdn."%hostName)
+                hostName = hostName.replace(".pdsi.corp","")
+            else:
+                logging.info("making host name %s  fully quilifed domain name" % hostName)
 
-            #servers.append(serverMap)
+
+            #row 0 is the server ID
+            serverMap[hostName]= str(row[0]).lower().strip()
+
 
 def get_server_id(hostName):
     print ("finding the server Id for the host name %s " %hostName)
@@ -94,13 +100,21 @@ def get_app_server_map(app_server_list):
     for line in app_server_list:
         print ("--->%s"%line)
         splitted = line.split(',')
+        if splitted is None:
+            continue
         key = str(splitted[0]).strip()
 
-        value = str(splitted[1]).lower()
+        value = str(splitted[1]).strip().lower()
+        print (key,value)
+        if(".pdsi.corp" in value):
+            value=value.replace(".pdsi.corp","")
+
         if(retVal.has_key(key)):
-            retVal[key] += ',' + value.strip() + ".pdsi.corp"
+            retVal[key] += ',' + value
+
         else:
-            retVal[key] = str(splitted[1]).strip().lower() + ".pdsi.corp"
+            retVal[key] = value
+        print retVal
     return retVal
 
 
@@ -138,7 +152,7 @@ if __name__ == '__main__':
 
         appId = get_app_id_from_ads(key)
 
-        msg = "**Now associating  App Id: %s with Servers  %s " % (appId, serverIds)
+        msg = "**Now associating  App Id: %s (%s) with Servers  %s " % (appId,key, serverIds)
         print (msg)
         logging.info(msg)
         try:
